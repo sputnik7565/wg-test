@@ -1,8 +1,9 @@
 class GameLogic {
-    constructor(player, monster, cards) {
+    constructor(player, stages, cards) {
         this.player = player;
-        this.monster = monster;
+        this.stages = stages;
         this.cards = cards;
+        this.stageIndex = 0;
         this.playerTurn = true;
         this.turnOrderMessage = '';
 
@@ -10,10 +11,43 @@ class GameLogic {
         this.step02 = document.getElementById('step-02');
         this.step021 = document.getElementById('step-02-1');
         this.step03 = document.getElementById('step-03');
+        this.stepVictory = document.getElementById('step-victory');
         this.battleLog = document.getElementById('battle-log');
         this.cardGroupDiv = document.getElementById('card-group');
         this.selectedCardsDiv = document.getElementById('selected-cards');
         this.damageLog = document.getElementById('damage-log');
+        this.titleElem = document.querySelector('h1');
+        this.monsterNameElem = document.getElementById('monster-name');
+
+        this.updateTitle();
+        this.addEventListeners();
+        this.selectRandomMonster();
+    }
+
+    addEventListeners() {
+        document.getElementById('next-turn-button').addEventListener('click', (event) => {
+            event.preventDefault();
+            this.nextTurn();
+        });
+        document.getElementById('restart-button').addEventListener('click', (event) => {
+            event.preventDefault();
+            this.restartGame();
+        });
+    }
+
+    updateTitle() {
+        this.titleElem.textContent = `스테이지 ${this.stageIndex + 1}`;
+    }
+
+    selectRandomMonster() {
+        const stageMonsters = this.stages[this.stageIndex].monsters;
+        const randomIndex = Math.floor(Math.random() * stageMonsters.length);
+        this.monster = new Monster(stageMonsters[randomIndex]);
+        this.updateMonsterName();
+    }
+
+    updateMonsterName() {
+        this.monsterNameElem.textContent = this.monster.name;
     }
 
     startBattle() {
@@ -87,7 +121,7 @@ class GameLogic {
 
     drawCards() {
         if (!this.player.selection.adjective || !this.player.selection.skill || !this.player.selection.result) {
-            alert('Please select a card from each group.');
+            // alert('Please select a card from each group.');
             return;
         }
 
@@ -112,9 +146,30 @@ class GameLogic {
         this.updateStatus();
 
         if (this.player.hp <= 0 || this.monster.hp <= 0) {
-            this.battleLog.innerHTML += `<p>전투가 종료되었습니다. ${this.player.hp <= 0 ? '플레이어' : '몬스터'}가 패배했습니다.</p>`;
+            const battleResultMessage = this.player.hp <= 0 ? `${this.monster.name}에게 패배했습니다.` : `${this.monster.name}와의 전투에서 승리했습니다.`;
+            this.battleLog.innerHTML += `<p>전투가 종료되었습니다. ${battleResultMessage}</p>`;
             document.getElementById('next-turn-button').disabled = true;
+
+            if (this.player.hp > 0) {
+                this.battleLog.innerHTML += `<p>${this.monster.name}와의 전투에서 승리했습니다.</p>`;
+                this.step03.classList.remove('active');
+                this.stepVictory.classList.add('active');
+            } else {
+                document.getElementById('restart-button').style.display = 'block';
+            }
         }
+    }
+
+    advanceToNextMonster() {
+        console.log('Advancing to the next monster.');
+        this.selectRandomMonster();
+        console.log(`Next monster: ${this.monster.name}`);
+        document.getElementById('next-turn-button').disabled = false;
+        this.stepVictory.classList.remove('active');
+        this.step02.classList.add('active');
+        this.player.selection = { adjective: null, skill: null, result: null };
+        this.populatePlayerChoices();
+        this.updateStatus();
     }
 
     drawRandomCards(cards) {
@@ -221,10 +276,61 @@ class GameLogic {
     }
 
     nextTurn() {
+        if (this.player.hp > 0 && this.monster.hp <= 0) {
+            console.log('Player has won the battle, advancing to next monster.');
+            this.advanceToNextMonster();
+        } else {
+            this.step03.classList.remove('active');
+            this.step02.classList.add('active');
+            this.player.selection = { adjective: null, skill: null, result: null };
+            this.determineTurnOrder();
+            this.populatePlayerChoices();
+        }
+        document.getElementById('next-turn-button').disabled = false; // 넥스트 버튼 활성화
+    }
+
+    restartGame() {
+        this.stageIndex = 0;
+        this.monsterIndex = 0;
+        this.player.hp = 100;
+        this.player.strength = 20;
+        this.player.intelligence = 15;
+        this.player.agility = 12;
+        this.player.physicalDefense = 10;
+        this.player.magicDefense = 8;
+        this.player.selection = { adjective: null, skill: null, result: null }; // 선택 초기화
+
+        this.updateTitle();
+        this.selectRandomMonster();
+        this.updateStatus();
         this.step03.classList.remove('active');
-        this.step02.classList.add('active');
-        this.player.selection = { adjective: null, skill: null, result: null };
-        this.determineTurnOrder();
-        this.populatePlayerChoices();
+        this.stepVictory.classList.remove('active');
+        document.getElementById('restart-button').style.display = 'none';
+        document.getElementById('next-turn-button').disabled = false; // 넥스트 버튼 활성화
+        this.step01.classList.add('active');
+        this.populatePlayerChoices(); // 카드 선택 초기화
     }
 }
+
+// DOMContentLoaded 이벤트 핸들러에서 GameLogic 초기화
+document.addEventListener('DOMContentLoaded', () => {
+    let gameData, cards;
+
+    Promise.all([
+        DataLoader.loadGameData(),
+        DataLoader.loadCards()
+    ]).then(([loadedGameData, loadedCards]) => {
+        gameData = loadedGameData;
+        cards = loadedCards;
+
+        const player = new Player(gameData.player);
+        const gameLogic = new GameLogic(player, gameData.stages, cards);
+
+        document.getElementById('start-battle-button').addEventListener('click', () => {
+            gameLogic.startBattle();
+        });
+        document.getElementById('draw-button').addEventListener('click', () => {
+            gameLogic.drawCards();
+        });
+    });
+});
