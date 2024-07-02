@@ -1,0 +1,61 @@
+{
+    "stages": [
+        {
+            "stageNumber": 1,
+            "environment": "forest",
+            "monsters": [
+                {
+                    "name": "Goblin",
+                    "hp": 80,
+                    "strength": 15,
+                    "intelligence": 5,
+                    "agility": 10,
+                    "physicalDefense": 8,
+                    "magicDefense": 5
+                },
+                {
+                    "name": "Orc",
+                    "hp": 120,
+                    "strength": 20,
+                    "intelligence": 7,
+                    "agility": 8,
+                    "physicalDefense": 12,
+                    "magicDefense": 6
+                }
+            ]
+        },
+        {
+            "stageNumber": 2,
+            "environment": "cave",
+            "monsters": [
+                {
+                    "name": "Troll",
+                    "hp": 150,
+                    "strength": 25,
+                    "intelligence": 6,
+                    "agility": 5,
+                    "physicalDefense": 15,
+                    "magicDefense": 8
+                },
+                {
+                    "name": "Dragon",
+                    "hp": 200,
+                    "strength": 30,
+                    "intelligence": 10,
+                    "agility": 12,
+                    "physicalDefense": 20,
+                    "magicDefense": 15
+                }
+            ]
+        }
+    ],
+    "player": {
+        "name": "Player",
+        "hp": 100,
+        "strength": 20,
+        "intelligence": 15,
+        "agility": 12,
+        "physicalDefense": 10,
+        "magicDefense": 8
+    }
+}

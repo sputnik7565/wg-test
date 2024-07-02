@@ -1,0 +1,32 @@
+{
+    "adjectives": [
+        {"name": "강력하게", "multiplier": 1.5},
+        {"name": "치명적으로", "multiplier": 3},
+        {"name": "빠르게", "effect": "먼저"},
+        {"name": "지속적으로", "multiplier": 1.2},
+        {"name": "평범하게", "multiplier": 1},
+        {"name": "방어적으로", "defenseMultiplier": 1.5},
+        {"name": "완벽하게", "successRate": 1},
+        {"name": "민첩하게", "evasion": 0.5}
+    ],
+    "skills": [
+        {"name": "화염 마법을", "baseDamage": 20, "type": "magic"},
+        {"name": "얼음 마법을", "baseDamage": 15, "type": "magic", "effect": "freeze"},
+        {"name": "전기 마법을", "baseDamage": 10, "type": "magic", "effect": "stun"},
+        {"name": "독 마법을", "baseDamage": 5, "type": "magic", "effect": "poison"},
+        {"name": "물리 공격을", "baseDamage": 25, "type": "physical"},
+        {"name": "방어 기술을", "defenseBoost": 10},
+        {"name": "치유 마법을", "heal": 30},
+        {"name": "회피 기술을", "evasion": 0.3}
+    ],
+    "results": [
+        {"name": "사용했습니다.", "success": true},
+        {"name": "사용하려다 실패했습니다.", "success": false},
+        {"name": "생각만 했습니다.", "success": false},
+        {"name": "연달아 사용했습니다.", "doubleEffect": true},
+        {"name": "사용하려다 방해받았습니다.", "success": false, "counterAttack": true},
+        {"name": "잘못 사용했습니다.", "reducedEffect": 0.5},
+        {"name": "의도와 다르게 사용했습니다.", "selfInflict": true},
+        {"name": "완벽하게 사용했습니다.", "successRate": 1, "doubleEffect": true}
+    ]
+}
